@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Vocabulary Flashcard App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .card-container {
+            perspective: 1000px;
+            height: 300px;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            padding: 30px;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            width: 100%;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        .card-front h2,
+        .card-back h2 {
+            font-size: 1.2em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .card-front .word,
+        .card-back .definition {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+            word-wrap: break-word;
+        }
+
+        .card-back .pronunciation {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .hint {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+        }
+
+        .stats-item {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+
+        .stats-label {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Vocabulary Flashcards</h1>
+            <p>Click the card to reveal the answer</p>
+        </div>
+
+        <div class="progress" id="progress"></div>
+
+        <div class="hint" id="hint">Click on the card to flip</div>
+
+        <div class="card-container" id="cardContainer">
+            <div class="card" id="card">
+                <div class="card-front">
+                    <h2>Word</h2>
+                    <div class="word" id="word"></div>
+                </div>
+                <div class="card-back">
+                    <h2>Definition</h2>
+                    <div class="definition" id="definition"></div>
+                    <div class="pronunciation" id="pronunciation"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-primary" id="prevBtn" onclick="previousCard()">← Previous</button>
+            <button class="btn-primary" id="nextBtn" onclick="nextCard()">Next →</button>
+            <button class="btn-secondary" id="shuffleBtn" onclick="shuffleCards()">Shuffle</button>
+            <button class="btn-secondary" id="resetBtn" onclick="resetCards()">Reset</button>
+        </div>
+
+        <div class="stats">
+            <div class="stats-item">
+                <div class="stats-label">Cards in Deck</div>
+                <div id="totalCards">0</div>
+            </div>
+            <div class="stats-item">
+                <div class="stats-label">Current Card</div>
+                <div id="currentCard">0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample vocabulary data
+        const vocabularyData = [
+            {
+                word: "Ubiquitous",
+                definition: "Present, appearing, or found everywhere",
+                pronunciation: "/juːˈbɪk.wə.təs/"
+            },
+            {
+                word: "Ephemeral",
+                definition: "Lasting for a very short time",
+                pronunciation: "/ɪˈfem.ə.rəl/"
+            },
+            {
+                word: "Serendipity",
+                definition: "The occurrence of events by chance in a happy or beneficial way",
+                pronunciation: "/ˌser.ən.dɪp.ə.ti/"
+            },
+            {
+                word: "Mellifluous",
+                definition: "Sweet or musical; pleasant to hear",
+                pronunciation: "/meˈlɪf.lu.əs/"
+            },
+            {
+                word: "Eloquent",
+                definition: "Fluent or persuasive in speaking or writing",
+                pronunciation: "/ˈel.ə.kwənt/"
+            },
+            {
+                word: "Pragmatic",
+                definition: "Dealing with things in a practical, realistic way",
+                pronunciation: "/præɡˈmæt.ɪk/"
+            },
+            {
+                word: "Aesthetic",
+                definition: "Concerned with beauty or the appreciation of beauty",
+                pronunciation: "/esˈθet.ɪk/"
+            },
+            {
+                word: "Vindicate",
+                definition: "To clear someone of blame or suspicion",
+                pronunciation: "/ˈvɪn.dɪ.keɪt/"
+            },
+            {
+                word: "Ambiguous",
+                definition: "Open to more than one interpretation; unclear",
+                pronunciation: "/æmˈbɪɡ.ju.əs/"
+            },
+            {
+                word: "Benevolent",
+                definition: "Kind and generous",
+                pronunciation: "/bəˈnev.ə.lənt/"
+            }
+        ];
+
+        let currentIndex = 0;
+        let cards = [...vocabularyData];
+        let isFlipped = false;
+
+        const cardElement = document.getElementById('card');
+        const wordElement = document.getElementById('word');
+        const definitionElement = document.getElementById('definition');
+        const pronunciationElement = document.getElementById('pronunciation');
+        const progressElement = document.getElementById('progress');
+        const currentCardElement = document.getElementById('currentCard');
+        const totalCardsElement = document.getElementById('totalCards');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const hintElement = document.getElementById('hint');
+
+        function initializeApp() {
+            totalCardsElement.textContent = cards.length;
+            displayCard();
+        }
+
+        function displayCard() {
+            const card = cards[currentIndex];
+            wordElement.textContent = card.word;
+            definitionElement.textContent = card.definition;
+            pronunciationElement.textContent = card.pronunciation;
+            currentCardElement.textContent = currentIndex + 1;
+            progressElement.textContent = `Card ${currentIndex + 1} of ${cards.length}`;
+            
+            isFlipped = false;
+            cardElement.classList.remove('flipped');
+            hintElement.textContent = 'Click on the card to reveal the answer';
+            
+            updateButtonStates();
+        }
+
+        function updateButtonStates() {
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === cards.length - 1;
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            cardElement.classList.toggle('flipped');
+            hintElement.textContent = isFlipped ? 'Click to see the word' : 'Click to reveal the answer';
+        }
+
+        function nextCard() {
+            if (currentIndex < cards.length - 1) {
+                currentIndex++;
+                displayCard();
+            }
+        }
+
+        function previousCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                displayCard();
+            }
+        }
+
+        function shuffleCards() {
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            currentIndex = 0;
+            displayCard();
+        }
+
+        function resetCards() {
+            cards = [...vocabularyData];
+            currentIndex = 0;
+            displayCard();
+        }
+
+        // Add click listener to flip card
+        document.getElementById('cardContainer').addEventListener('click', flipCard);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextCard();
+            if (e.key === 'ArrowLeft') previousCard();
+            if (e.key === ' ') {
+                e.preventDefault();
+                flipCard();
+            }
+        });
+
+        // Initialize the app
+        initializeApp();
+    </script>
+</body>
+</html>
