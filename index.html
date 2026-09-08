@@ -113,8 +113,6 @@
     .def{margin-top:8px;font-size:14px;color:var(--dusty);line-height:1.5}
     .example{margin-top:12px;font-size:13px;color:var(--muted);background:rgba(139,150,161,0.04);padding:10px;border-radius:10px;border-left:3px solid rgba(154,168,154,0.18)}
 
-    .flip-hint{font-size:12px;color:var(--muted);position:absolute;top:10px;left:12px}
-
     /* Controls */
     .controls{display:flex;flex-direction:column;gap:10px;padding:6px}
     .main-actions{display:flex;gap:10px}
@@ -209,7 +207,6 @@
             <div class="flashcard" id="flashcard" aria-live="polite">
               <div class="card-inner" id="cardInner">
                 <div class="card-face face-front" id="faceFront">
-                  <div class="flip-hint">點擊卡片以顯示解答</div>
                   <div class="word-large" id="wordDisplay">Word</div>
                   <div class="pron-small" id="pronunciationSmall"></div>
                 </div>
@@ -225,19 +222,19 @@
 
         <div class="controls">
           <div class="main-actions">
-            <button class="btn btn-unk" id="btnUnknown">❌ 不認識</button>
-            <button class="btn btn-know" id="btnKnown">✅ 認識</button>
+            <button class="btn btn-unk" id="btnUnknown">不認識</button>
+            <button class="btn btn-know" id="btnKnown">認識</button>
           </div>
 
           <div class="small-actions">
             <div style="display:flex;gap:8px">
-              <button class="icon-btn" id="btnPrev">◀ 上一個</button>
-              <button class="icon-btn" id="btnNext">下一個 ▶</button>
+              <button class="icon-btn" id="btnPrev">上一個</button>
+              <button class="icon-btn" id="btnNext">下一個</button>
             </div>
             <div style="display:flex;gap:8px">
-              <button class="icon-btn" id="btnSpeak">🔊 發音</button>
-              <button class="icon-btn" id="btnShuffle">🔀 隨機</button>
-              <button class="icon-btn" id="btnReset">↺ 重置</button>
+              <button class="icon-btn" id="btnSpeak">發音</button>
+              <button class="icon-btn" id="btnShuffle">隨機</button>
+              <button class="icon-btn" id="btnReset">重置</button>
             </div>
           </div>
         </div>
@@ -252,7 +249,7 @@
       <!-- Custom Screen -->
       <section id="custom" class="screen" style="display:none">
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px">
-          <button class="btn" id="btnAddCustom">＋ 新增詞彙</button>
+          <button class="btn" id="btnAddCustom">新增詞彙</button>
           <div class="pill">自訂詞彙：<span id="customCount">0</span></div>
         </div>
         <div id="customList" class="list"></div>
@@ -265,8 +262,8 @@
           <div class="stat-card">
             <div class="stat-label">資料管理</div>
             <div style="display:flex;gap:8px;margin-top:8px">
-              <button class="btn btn-light" id="btnExport">📥 匯出資料</button>
-              <button class="btn btn-light" id="btnClear">🗑️ 清除所有資料</button>
+              <button class="btn btn-light" id="btnExport">匯出資料</button>
+              <button class="btn btn-light" id="btnClear">清除所有資料</button>
             </div>
           </div>
 
@@ -296,7 +293,7 @@
     <div class="sheet">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <div style="font-weight:700">新增 / 編輯詞彙</div>
-        <button class="icon-btn" id="modalClose">✕</button>
+        <button class="icon-btn" id="modalClose">關閉</button>
       </div>
       <form id="wordForm">
         <div class="form-row">
@@ -328,16 +325,26 @@
     const STORAGE_KEYS = {all:'allWords', known:'knownWords', unknown:'unknownWords', custom:'customWords', idx:'currentIndex'};
 
     const defaultWords = [
-      {word:"Serendipity", chinese:"出奇不意的好運", definition:"The occurrence of events by chance in a happy or beneficial way.", pronunciation:"/ˌserənˈdɪpɪti/", example:"Finding that old letter was pure serendipity."},
-      {word:"Eloquent", chinese:"雄辯的，表達能力強的", definition:"Fluent or persuasive in speaking or writing.", pronunciation:"/ˈeləkwənt/", example:"She gave an eloquent speech."},
-      {word:"Ephemeral", chinese:"短暫的，瞬間的", definition:"Lasting for a very short time.", pronunciation:"/ɪˈfem(ə)rəl/", example:"Fashion trends are often ephemeral."},
-      {word:"Pragmatic", chinese:"實際的，實用主義的", definition:"Dealing with things in a practical, realistic way.", pronunciation:"/præɡˈmætɪk/", example:"We need a pragmatic solution."},
-      {word:"Benevolent", chinese:"慈善的，仁慈的", definition:"Kind and generous.", pronunciation:"/bəˈnevələnt/", example:"A benevolent donor supported the school."},
-      {word:"Ubiquitous", chinese:"普遍存在的", definition:"Present, appearing, or found everywhere.", pronunciation:"/juːˈbɪkwɪtəs/", example:"Smartphones are ubiquitous."},
-      {word:"Ambiguous", chinese:"含糊的，模棱兩可的", definition:"Open to more than one interpretation; unclear.", pronunciation:"/æmˈbɪɡjuəs/", example:"The wording was ambiguous."},
-      {word:"Aesthetic", chinese:"美學的，有美感的", definition:"Concerned with beauty or the appreciation of beauty.", pronunciation:"/iːsˈθetɪk/", example:"The room had an aesthetic design."},
-      {word:"Mellifluous", chinese:"悅耳的，流暢的", definition:"Sweet or musical; pleasant to hear.", pronunciation:"/məˈlɪfluəs/", example:"Her mellifluous voice soothed the crowd."},
-      {word:"Nostalgia", chinese:"懷舊，鄉愁", definition:"A sentimental longing for the past.", pronunciation:"/nɒˈstældʒə/", example:"Old songs fill me with nostalgia."}
+      // IELTS 高频学术词 & Accounting terms (Traditional Chinese meanings)
+      {word: "Analyze", chinese: "分析", definition: "Examine methodically and in detail.", pronunciation: "/ˈænəlaɪz/", example: "The study aims to analyze the data."},
+      {word: "Assess", chinese: "評估", definition: "Evaluate or estimate the nature, ability, or quality of.", pronunciation: "/əˈsɛs/", example: "We need to assess the impact."},
+      {word: "Significant", chinese: "重要的；顯著的", definition: "Sufficiently great or important to be worthy of attention.", pronunciation: "/sɪɡˈnɪfɪkənt/", example: "There was a significant increase."},
+      {word: "Coherent", chinese: "連貫的", definition: "Logical and consistent.", pronunciation: "/kəʊˈhɪərənt/", example: "The argument was coherent."},
+      {word: "Sufficient", chinese: "足夠的", definition: "Enough; adequate.", pronunciation: "/səˈfɪʃənt/", example: "There is sufficient evidence."},
+      {word: "Illustrate", chinese: "說明；闡明", definition: "Explain or make (something) clear by using examples.", pronunciation: "/ˈɪləstreɪt/", example: "The diagram helps illustrate the process."},
+      {word: "Implication", chinese: "含意；可能的影響", definition: "A possible effect or result of an action or a decision.", pronunciation: "/ˌɪmplɪˈkeɪʃən/", example: "Consider the implications of the policy."},
+      {word: "Hypothesis", chinese: "假設", definition: "A proposed explanation made on the basis of limited evidence.", pronunciation: "/haɪˈpɒθəsɪs/", example: "The hypothesis was tested."},
+      {word: "Sustainable", chinese: "可持續的", definition: "Able to be maintained at a certain rate or level.", pronunciation: "/səˈsteɪnəbəl/", example: "We aim for sustainable growth."},
+      {word: "Aggregate", chinese: "總計；集成", definition: "Formed or calculated by the combination of several separate elements.", pronunciation: "/ˈæɡrɪɡət/", example: "Aggregate demand increased."},
+      // Accounting-specific
+      {word: "Asset", chinese: "資產", definition: "A resource with economic value owned by an individual or corporation.", pronunciation: "/ˈæsɛt/", example: "The company sold some assets."},
+      {word: "Liability", chinese: "負債", definition: "A company's legal debts or obligations.", pronunciation: "/ˌlaɪəˈbɪlɪti/", example: "Long-term liabilities rose."},
+      {word: "Revenue", chinese: "營收；收入", definition: "Income generated from normal business operations.", pronunciation: "/ˈrɛvəˌnuː/", example: "Annual revenue increased."},
+      {word: "Expense", chinese: "費用；支出", definition: "The economic costs a business incurs through operations.", pronunciation: "/ɪkˈspɛns/", example: "Reduce operating expenses."},
+      {word: "Depreciation", chinese: "折舊", definition: "A reduction in the value of an asset over time.", pronunciation: "/dɪˌpriːʃiˈeɪʃən/", example: "Depreciation affects net income."},
+      {word: "Accrual", chinese: "應計；應計項目", definition: "An accounting method that records revenues when earned and expenses when incurred.", pronunciation: "/əˈkruːəl/", example: "Use accrual accounting principles."},
+      {word: "Audit", chinese: "稽核；查帳", definition: "An official inspection of an organization's accounts.", pronunciation: "/ˈɔːdɪt/", example: "The audit was completed."},
+      {word: "Equity", chinese: "權益；股東權益", definition: "The value of shares issued by a company.", pronunciation: "/ˈekwɪti/", example: "Shareholders' equity increased."}
     ];
 
     let allWords=[], knownWords=[], unknownWords=[], customWords=[], currentIndex=0;
@@ -471,7 +478,6 @@
     function nextCard(){
       const list = getWorkingList();
       if(list.length===0) return;
-      // animate swipe: tiny offset via class toggle
       flashcard.classList.add('swipe-next');
       setTimeout(()=>{ flashcard.classList.remove('swipe-next'); },300);
       currentIndex = (currentIndex < list.length-1) ? currentIndex+1 : 0;
@@ -501,7 +507,10 @@
       if(!unknownWords.find(x=>x.word===w.word)) unknownWords.push(w);
       knownWords = knownWords.filter(x=>x.word!==w.word);
       saveData();
-      nextCard();
+      // show chinese meaning immediately by flipping the card, then proceed after short delay
+      flashcard.classList.add('flipped');
+      updateStats();
+      setTimeout(()=>{ nextCard(); }, 1400);
     }
 
     /* Shuffle & Reset */
@@ -531,8 +540,8 @@
         const el = document.createElement('div'); el.className='list-item';
         el.innerHTML = `<div class="list-left"><div class="list-title">${w.word}</div><div class="list-sub">${w.chinese}</div></div>`;
         const actions = document.createElement('div'); actions.className='list-actions';
-        const mark = document.createElement('button'); mark.className='pill'; mark.textContent='✅ 已掌握'; mark.onclick=()=>{ knownWords.push(w); unknownWords.splice(i,1); saveData(); renderReview(); updateStats(); };
-        const del = document.createElement('button'); del.className='pill'; del.textContent='🗑️ 刪除'; del.onclick=()=>{ if(confirm('確定刪除？')){ unknownWords.splice(i,1); saveData(); renderReview(); updateStats(); }};
+        const mark = document.createElement('button'); mark.className='pill'; mark.textContent='已掌握'; mark.onclick=()=>{ knownWords.push(w); unknownWords.splice(i,1); saveData(); renderReview(); updateStats(); };
+        const del = document.createElement('button'); del.className='pill'; del.textContent='刪除'; del.onclick=()=>{ if(confirm('確定刪除？')){ unknownWords.splice(i,1); saveData(); renderReview(); updateStats(); }};
         actions.appendChild(mark); actions.appendChild(del);
         el.appendChild(actions); reviewList.appendChild(el);
       });
@@ -546,8 +555,8 @@
         const el = document.createElement('div'); el.className='list-item';
         el.innerHTML = `<div class="list-left"><div class="list-title">${w.word}</div><div class="list-sub">${w.chinese}</div></div>`;
         const actions = document.createElement('div'); actions.className='list-actions';
-        const edit = document.createElement('button'); edit.className='pill'; edit.textContent='✏️ 編輯'; edit.onclick=()=>{ openModalForEdit(i); };
-        const del = document.createElement('button'); del.className='pill'; del.textContent='🗑️ 刪除'; del.onclick=()=>{ if(confirm('確定刪除？')){ customWords.splice(i,1); allWords = allWords.filter(x=>x.word!==w.word); saveData(); renderCustom(); updateStats(); renderCard(); }};
+        const edit = document.createElement('button'); edit.className='pill'; edit.textContent='編輯'; edit.onclick=()=>{ openModalForEdit(i); };
+        const del = document.createElement('button'); del.className='pill'; del.textContent='刪除'; del.onclick=()=>{ if(confirm('確定刪除？')){ customWords.splice(i,1); allWords = allWords.filter(x=>x.word!==w.word); saveData(); renderCustom(); updateStats(); renderCard(); }};
         actions.appendChild(edit); actions.appendChild(del);
         el.appendChild(actions); customList.appendChild(el);
       });
