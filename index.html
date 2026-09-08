@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Vocabulary Flashcard App</title>
+    <title>英語詞彙學習 - Vocabulary App</title>
     <style>
         * {
             margin: 0;
@@ -11,360 +11,1031 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 600px;
+        html, body {
             width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
         }
 
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
         .header {
+            background-color: white;
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
             text-align: center;
-            color: white;
-            margin-bottom: 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
 
         .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+            font-size: 14px;
+            color: #666;
         }
 
-        .card-container {
-            perspective: 1000px;
-            height: 300px;
-            margin-bottom: 30px;
+        /* Navigation Tabs */
+        .tabs {
+            display: flex;
+            background-color: white;
+            border-bottom: 1px solid #e0e0e0;
+            overflow-x: auto;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            color: #999;
+            white-space: nowrap;
+            transition: all 0.3s ease;
         }
 
-        .card {
+        .tab.active {
+            color: #333;
+            border-bottom-color: #4CAF50;
+        }
+
+        /* Main Content */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Progress Bar */
+        .progress-section {
+            background-color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .progress-bar {
             width: 100%;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
             height: 100%;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background-color: #4CAF50;
+            transition: width 0.3s ease;
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .stat-item {
+            background-color: #f9f9f9;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #4CAF50;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        /* Flashcard */
+        .card-container {
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            text-align: center;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            padding: 30px;
+            margin-bottom: 16px;
+            perspective: 1000px;
         }
 
-        .card.flipped {
-            transform: rotateY(180deg);
-        }
-
-        .card-front, .card-back {
-            backface-visibility: hidden;
+        .flashcard {
             width: 100%;
+            max-width: 400px;
+            height: 280px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 2px solid #e0e0e0;
+        }
+
+        .flashcard:active {
+            transform: scale(0.98);
+        }
+
+        .card-front {
+            display: none;
+        }
+
+        .card-front.active {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .card-back {
-            transform: rotateY(180deg);
+            display: none;
         }
 
-        .card-front h2,
-        .card-back h2 {
-            font-size: 1.2em;
-            color: #667eea;
-            margin-bottom: 10px;
+        .card-back.active {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .card-front .word,
-        .card-back .definition {
-            font-size: 2.5em;
-            font-weight: bold;
+        .card-label {
+            font-size: 12px;
+            color: #999;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .word {
+            font-size: 40px;
+            font-weight: 700;
             color: #333;
-            word-wrap: break-word;
         }
 
-        .card-back .pronunciation {
-            font-size: 0.9em;
+        .chinese-meaning {
+            font-size: 24px;
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .definition {
+            font-size: 14px;
             color: #666;
-            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .pronunciation {
+            font-size: 12px;
+            color: #999;
             font-style: italic;
         }
 
-        .hint {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 20px;
-            font-size: 0.9em;
+        .example {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            font-style: italic;
+            background-color: #f9f9f9;
+            padding: 8px;
+            border-radius: 4px;
+            border-left: 3px solid #4CAF50;
         }
 
-        .controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
+        .flip-hint {
+            font-size: 11px;
+            color: #ccc;
+            margin-top: 12px;
+        }
+
+        /* Control Buttons */
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .button-group.four-cols {
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+        }
+
+        .button-group.single-col {
+            grid-template-columns: 1fr;
         }
 
         button {
-            padding: 12px 24px;
-            font-size: 1em;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: white;
+            transition: all 0.2s ease;
+            text-align: center;
+            white-space: nowrap;
         }
 
-        .btn-primary {
-            background: white;
-            color: #667eea;
+        button:active {
+            transform: scale(0.96);
+            opacity: 0.8;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid white;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary:disabled {
+        button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .progress {
-            text-align: center;
+        .btn-primary {
+            background-color: #4CAF50;
             color: white;
-            margin-bottom: 20px;
-            font-size: 1.1em;
         }
 
-        .stats {
-            background: rgba(255, 255, 255, 0.1);
+        .btn-primary:active {
+            background-color: #45a049;
+        }
+
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn-secondary:active {
+            background-color: #e0e0e0;
+        }
+
+        .btn-danger {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .btn-danger:active {
+            background-color: #da190b;
+        }
+
+        .btn-warning {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .btn-warning:active {
+            background-color: #e68900;
+        }
+
+        .btn-info {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .btn-info:active {
+            background-color: #0b7dda;
+        }
+
+        .btn-sound {
+            background-color: #6c63ff;
+            color: white;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        .btn-sound:active {
+            background-color: #5a52d5;
+        }
+
+        /* Review List */
+        .word-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .word-item {
+            background-color: white;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #f44336;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .word-info {
+            flex: 1;
+        }
+
+        .word-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .word-subtitle {
+            font-size: 13px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .word-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        /* Add Word Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-end;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-content {
+            background-color: white;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 12px 12px 0 0;
             padding: 20px;
-            border-radius: 10px;
-            color: white;
-            text-align: center;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        .stats-item {
-            margin: 10px 0;
-            font-size: 1.1em;
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .stats-label {
-            opacity: 0.8;
-            font-size: 0.9em;
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .button-group.four-cols {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .word {
+                font-size: 32px;
+            }
+
+            .flashcard {
+                height: 240px;
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+
+        .bottom-nav {
+            background-color: white;
+            border-top: 1px solid #e0e0e0;
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+            padding-top: 8px;
+            margin-top: auto;
+        }
+
+        .content {
+            padding-bottom: 0;
+        }
+
+        /* iOS safe area support */
+        .header, .tabs {
+            padding-left: max(16px, env(safe-area-inset-left));
+            padding-right: max(16px, env(safe-area-inset-right));
+        }
+
+        .content {
+            padding-left: max(16px, env(safe-area-inset-left));
+            padding-right: max(16px, env(safe-area-inset-right));
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
+        <!-- Header -->
         <div class="header">
-            <h1>📚 Vocabulary Flashcards</h1>
-            <p>Click the card to reveal the answer</p>
+            <h1>📚 Vocabulary</h1>
+            <p>英語詞彙學習</p>
         </div>
 
-        <div class="progress" id="progress"></div>
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('study')">Study</div>
+            <div class="tab" onclick="switchTab('review')">錯詞本</div>
+            <div class="tab" onclick="switchTab('custom')">我的詞彙</div>
+            <div class="tab" onclick="switchTab('settings')">設定</div>
+        </div>
 
-        <div class="hint" id="hint">Click on the card to flip</div>
-
-        <div class="card-container" id="cardContainer">
-            <div class="card" id="card">
-                <div class="card-front">
-                    <h2>Word</h2>
-                    <div class="word" id="word"></div>
+        <!-- Content Area -->
+        <div class="content">
+            <!-- Study Screen -->
+            <div class="screen active" id="study-screen">
+                <div class="progress-section">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="currentCard">1</div>
+                            <div class="stat-label">進度</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="knownCount">0</div>
+                            <div class="stat-label">認識</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="unknownCount">0</div>
+                            <div class="stat-label">不認識</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-back">
-                    <h2>Definition</h2>
-                    <div class="definition" id="definition"></div>
-                    <div class="pronunciation" id="pronunciation"></div>
+
+                <div class="card-container">
+                    <div class="flashcard" id="flashcard">
+                        <div class="card-front active">
+                            <div class="card-label">Word</div>
+                            <div class="word" id="wordDisplay">Word</div>
+                            <div class="flip-hint">👆 Tap to reveal</div>
+                        </div>
+                        <div class="card-back">
+                            <div class="card-label">Chinese</div>
+                            <div class="chinese-meaning" id="chineseDisplay">中文</div>
+                            <div class="definition" id="definitionDisplay">Definition</div>
+                            <div class="pronunciation" id="pronunciationDisplay">Pronunciation</div>
+                            <div class="example" id="exampleDisplay">Example sentence</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-sound" id="pronunciationBtn" onclick="speakWord()">🔊 發音</button>
+                    <button class="btn-secondary" onclick="previousCard()">← 上一個</button>
+                    <button class="btn-secondary" onclick="nextCard()" style="order: 4;">下一個 →</button>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-danger" onclick="markUnknown()">❌ 不認識</button>
+                    <button class="btn-primary" onclick="markKnown()">✅ 認識</button>
+                </div>
+
+                <div class="button-group four-cols">
+                    <button class="btn-secondary" onclick="shuffleCards()">🔀 Shuffle</button>
+                    <button class="btn-secondary" onclick="resetStudy()">🔄 Reset</button>
+                    <button class="btn-secondary" onclick="calculateAccuracy()">📊 Accuracy</button>
+                </div>
+            </div>
+
+            <!-- Review Screen -->
+            <div class="screen" id="review-screen">
+                <div id="reviewList" class="word-list"></div>
+                <div id="reviewEmpty" class="empty-state">
+                    <div class="empty-state-icon">✅</div>
+                    <div class="empty-state-text">All words learned!</div>
+                    <div class="empty-state-text" style="font-size: 13px; margin-top: 8px;">Keep practicing to improve your vocabulary.</div>
+                </div>
+            </div>
+
+            <!-- Custom Words Screen -->
+            <div class="screen" id="custom-screen">
+                <button class="btn-primary" onclick="openAddWordModal()" style="margin-bottom: 16px; width: 100%;">+ Add Custom Word</button>
+                <div id="customList" class="word-list"></div>
+                <div id="customEmpty" class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <div class="empty-state-text">No custom words yet</div>
+                    <div class="empty-state-text" style="font-size: 13px; margin-top: 8px;">Add your own words to practice.</div>
+                </div>
+            </div>
+
+            <!-- Settings Screen -->
+            <div class="screen" id="settings-screen">
+                <div style="background-color: white; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <h3 style="margin-bottom: 16px; font-size: 16px;">Data Management</h3>
+                    <button class="btn-warning" onclick="exportData()" style="width: 100%; margin-bottom: 8px;">📥 Export Data</button>
+                    <button class="btn-secondary" onclick="clearAllData()" style="width: 100%; margin-bottom: 16px;">🗑️ Clear All Data</button>
+                    
+                    <h3 style="margin-bottom: 16px; font-size: 16px;">App Info</h3>
+                    <p style="font-size: 13px; color: #666; line-height: 1.6;">
+                        <strong>Vocabulary App v1.0</strong><br>
+                        A mobile-friendly English vocabulary learning tool.<br>
+                        Data is saved locally on your device using localStorage.
+                    </p>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="controls">
-            <button class="btn-primary" id="prevBtn" onclick="previousCard()">← Previous</button>
-            <button class="btn-primary" id="nextBtn" onclick="nextCard()">Next →</button>
-            <button class="btn-secondary" id="shuffleBtn" onclick="shuffleCards()">Shuffle</button>
-            <button class="btn-secondary" id="resetBtn" onclick="resetCards()">Reset</button>
-        </div>
-
-        <div class="stats">
-            <div class="stats-item">
-                <div class="stats-label">Cards in Deck</div>
-                <div id="totalCards">0</div>
+    <!-- Add Word Modal -->
+    <div class="modal" id="addWordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Add Custom Word</span>
+                <button class="modal-close" onclick="closeAddWordModal()">✕</button>
             </div>
-            <div class="stats-item">
-                <div class="stats-label">Current Card</div>
-                <div id="currentCard">0</div>
-            </div>
+            <form onsubmit="saveCustomWord(event)">
+                <div class="form-group">
+                    <label>English Word *</label>
+                    <input type="text" id="customWord" required>
+                </div>
+                <div class="form-group">
+                    <label>Chinese Meaning *</label>
+                    <input type="text" id="customChinese" required>
+                </div>
+                <div class="form-group">
+                    <label>English Definition</label>
+                    <textarea id="customDefinition"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Example Sentence</label>
+                    <textarea id="customExample"></textarea>
+                </div>
+                <div class="button-group single-col">
+                    <button type="submit" class="btn-primary">Save Word</button>
+                    <button type="button" class="btn-secondary" onclick="closeAddWordModal()">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
         // Sample vocabulary data
-        const vocabularyData = [
-            {
-                word: "Ubiquitous",
-                definition: "Present, appearing, or found everywhere",
-                pronunciation: "/juːˈbɪk.wə.təs/"
-            },
-            {
-                word: "Ephemeral",
-                definition: "Lasting for a very short time",
-                pronunciation: "/ɪˈfem.ə.rəl/"
-            },
-            {
-                word: "Serendipity",
-                definition: "The occurrence of events by chance in a happy or beneficial way",
-                pronunciation: "/ˌser.ən.dɪp.ə.ti/"
-            },
-            {
-                word: "Mellifluous",
-                definition: "Sweet or musical; pleasant to hear",
-                pronunciation: "/meˈlɪf.lu.əs/"
-            },
-            {
-                word: "Eloquent",
-                definition: "Fluent or persuasive in speaking or writing",
-                pronunciation: "/ˈel.ə.kwənt/"
-            },
-            {
-                word: "Pragmatic",
-                definition: "Dealing with things in a practical, realistic way",
-                pronunciation: "/præɡˈmæt.ɪk/"
-            },
-            {
-                word: "Aesthetic",
-                definition: "Concerned with beauty or the appreciation of beauty",
-                pronunciation: "/esˈθet.ɪk/"
-            },
-            {
-                word: "Vindicate",
-                definition: "To clear someone of blame or suspicion",
-                pronunciation: "/ˈvɪn.dɪ.keɪt/"
-            },
-            {
-                word: "Ambiguous",
-                definition: "Open to more than one interpretation; unclear",
-                pronunciation: "/æmˈbɪɡ.ju.əs/"
-            },
-            {
-                word: "Benevolent",
-                definition: "Kind and generous",
-                pronunciation: "/bəˈnev.ə.lənt/"
-            }
+        const defaultWords = [
+            { word: "Serendipity", chinese: "出奇不意的好運", definition: "The occurrence of events by chance in a happy or beneficial way.", pronunciation: "/ˌserənˈdɪpɪti/", example: "Finding this job was pure serendipity." },
+            { word: "Eloquent", chinese: "雄辯的，表達能力強的", definition: "Fluent or persuasive in speaking or writing.", pronunciation: "/ˈeləkwənt/", example: "The speaker gave an eloquent speech about climate change." },
+            { word: "Ephemeral", chinese: "短暫的，瞬間的", definition: "Lasting for a very short time.", pronunciation: "/ɪˈfem(ə)rəl/", example: "The beauty of cherry blossoms is ephemeral." },
+            { word: "Pragmatic", chinese: "實際的，實用主義的", definition: "Dealing with things in a practical, realistic way.", pronunciation: "/præɡˈmætɪk/", example: "We need a pragmatic approach to solve this problem." },
+            { word: "Benevolent", chinese: "慈善的，仁慈的", definition: "Kind and generous.", pronunciation: "/bəˈnevələnt/", example: "The benevolent organization donated millions to charity." },
+            { word: "Ubiquitous", chinese: "無��不在的，普遍的", definition: "Present, appearing, or found everywhere.", pronunciation: "/juːˈbɪkwɪtəs/", example: "Smartphones have become ubiquitous in modern society." },
+            { word: "Ambiguous", chinese: "含糊的，模棱兩可的", definition: "Open to more than one interpretation; unclear.", pronunciation: "/æmˈbɪɡjuəs/", example: "The instructions were ambiguous and confusing." },
+            { word: "Aesthetic", chinese: "美學的，有美感的", definition: "Concerned with beauty or the appreciation of beauty.", pronunciation: "/esˈθetɪk/", example: "The museum's aesthetic design attracts visitors worldwide." },
+            { word: "Vindicate", chinese: "證明無罪，為…辯護", definition: "To clear someone of blame or suspicion.", pronunciation: "/ˈvɪndɪkeɪt/", example: "The evidence vindicated the defendant." },
+            { word: "Mellifluous", chinese: "甜蜜的，悅耳的", definition: "Sweet or musical; pleasant to hear.", pronunciation: "/meˈlɪfluəs/", example: "She has a mellifluous voice." },
+            { word: "Obfuscate", chinese: "使難以理解，混淆", definition: "To deliberately make something unclear or hard to understand.", pronunciation: "/ˈɒbfʌskeɪt/", example: "The company tried to obfuscate the truth about the incident." },
+            { word: "Pertinent", chinese: "相關的，恰當的", definition: "Relevant or applicable to a particular matter.", pronunciation: "/ˈpɜːrtɪnənt/", example: "Please only ask pertinent questions." },
+            { word: "Gregarious", chinese: "喜歡群聚的，愛交際的", definition: "Fond of being in the company of others; sociable.", pronunciation: "/ɡrɪˈɡeːriəs/", example: "Humans are gregarious creatures who enjoy social interaction." },
+            { word: "Meticulous", chinese: "細心的，一絲不苟的", definition: "Showing great attention to detail; very careful and precise.", pronunciation: "/məˈtɪkjələs/", example: "She is meticulous about her work." },
+            { word: "Transient", chinese: "短暫的，轉移的", definition: "Temporary; lasting only for a short time.", pronunciation: "/ˈtrænziənt/", example: "Our relationship was transient and brief." },
+            { word: "Cacophony", chinese: "刺耳的聲音，不協和音", definition: "A harsh, discordant sound or mixture of sounds.", pronunciation: "/kəˈkɒfəni/", example: "The cacophony of the construction site was unbearable." },
+            { word: "Sanguine", chinese: "樂觀的，滿懷希望的", definition: "Optimistic or positive, especially about the future.", pronunciation: "/ˈsæŋɡwɪn/", example: "Despite the challenges, she remained sanguine about the outcome." },
+            { word: "Nostalgia", chinese: "鄉愁，懷舊", definition: "A sentimental longing for the past.", pronunciation: "/nɒˈstældʒə/", example: "Watching old videos filled me with nostalgia." },
+            { word: "Verbose", chinese: "冗長的，囉唆的", definition: "Using or containing more words than necessary; wordy.", pronunciation: "/vɜːrˈbəʊs/", example: "His writing style is too verbose." },
+            { word: "Zenith", chinese: "最高點，頂峰", definition: "The highest point or peak of something.", pronunciation: "/ˈzenɪθ/", example: "The company reached its zenith in 2020." }
         ];
 
+        // Initialize app
+        let allWords = [];
         let currentIndex = 0;
-        let cards = [...vocabularyData];
-        let isFlipped = false;
+        let knownWords = [];
+        let unknownWords = [];
+        let customWords = [];
+        let isCardFlipped = false;
 
-        const cardElement = document.getElementById('card');
-        const wordElement = document.getElementById('word');
-        const definitionElement = document.getElementById('definition');
-        const pronunciationElement = document.getElementById('pronunciation');
-        const progressElement = document.getElementById('progress');
-        const currentCardElement = document.getElementById('currentCard');
-        const totalCardsElement = document.getElementById('totalCards');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const hintElement = document.getElementById('hint');
-
-        function initializeApp() {
-            totalCardsElement.textContent = cards.length;
+        function initApp() {
+            loadData();
+            if (allWords.length === 0) {
+                allWords = JSON.parse(JSON.stringify(defaultWords));
+                saveData();
+            }
             displayCard();
+            updateReviewList();
+            updateCustomList();
+            updateProgress();
+        }
+
+        function saveData() {
+            localStorage.setItem('allWords', JSON.stringify(allWords));
+            localStorage.setItem('knownWords', JSON.stringify(knownWords));
+            localStorage.setItem('unknownWords', JSON.stringify(unknownWords));
+            localStorage.setItem('customWords', JSON.stringify(customWords));
+            localStorage.setItem('currentIndex', currentIndex);
+        }
+
+        function loadData() {
+            allWords = JSON.parse(localStorage.getItem('allWords')) || [];
+            knownWords = JSON.parse(localStorage.getItem('knownWords')) || [];
+            unknownWords = JSON.parse(localStorage.getItem('unknownWords')) || [];
+            customWords = JSON.parse(localStorage.getItem('customWords')) || [];
+            currentIndex = parseInt(localStorage.getItem('currentIndex')) || 0;
         }
 
         function displayCard() {
-            const card = cards[currentIndex];
-            wordElement.textContent = card.word;
-            definitionElement.textContent = card.definition;
-            pronunciationElement.textContent = card.pronunciation;
-            currentCardElement.textContent = currentIndex + 1;
-            progressElement.textContent = `Card ${currentIndex + 1} of ${cards.length}`;
-            
-            isFlipped = false;
-            cardElement.classList.remove('flipped');
-            hintElement.textContent = 'Click on the card to reveal the answer';
-            
-            updateButtonStates();
+            const workingList = getCurrentWorkingList();
+            if (workingList.length === 0) {
+                document.getElementById('wordDisplay').textContent = 'No words';
+                return;
+            }
+
+            const card = workingList[currentIndex];
+            document.getElementById('wordDisplay').textContent = card.word;
+            document.getElementById('chineseDisplay').textContent = card.chinese;
+            document.getElementById('definitionDisplay').textContent = card.definition || 'No definition';
+            document.getElementById('pronunciationDisplay').textContent = card.pronunciation || '';
+            document.getElementById('exampleDisplay').textContent = card.example || 'No example';
+
+            resetCardFlip();
+            updateProgress();
         }
 
-        function updateButtonStates() {
-            prevBtn.disabled = currentIndex === 0;
-            nextBtn.disabled = currentIndex === cards.length - 1;
+        function getCurrentWorkingList() {
+            if (unknownWords.length > 0) {
+                return unknownWords.concat(allWords.filter(w => !unknownWords.find(u => u.word === w.word)));
+            }
+            return allWords;
+        }
+
+        function resetCardFlip() {
+            isCardFlipped = false;
+            document.querySelector('.card-front').classList.add('active');
+            document.querySelector('.card-back').classList.remove('active');
         }
 
         function flipCard() {
-            isFlipped = !isFlipped;
-            cardElement.classList.toggle('flipped');
-            hintElement.textContent = isFlipped ? 'Click to see the word' : 'Click to reveal the answer';
+            isCardFlipped = !isCardFlipped;
+            document.querySelector('.card-front').classList.toggle('active');
+            document.querySelector('.card-back').classList.toggle('active');
+        }
+
+        function speakWord() {
+            const workingList = getCurrentWorkingList();
+            if (workingList.length === 0) return;
+            
+            const word = workingList[currentIndex].word;
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function markKnown() {
+            const workingList = getCurrentWorkingList();
+            if (workingList.length === 0) return;
+
+            const word = workingList[currentIndex];
+            if (!knownWords.find(w => w.word === word.word)) {
+                knownWords.push(word);
+            }
+            unknownWords = unknownWords.filter(w => w.word !== word.word);
+            saveData();
+            nextCard();
+        }
+
+        function markUnknown() {
+            const workingList = getCurrentWorkingList();
+            if (workingList.length === 0) return;
+
+            const word = workingList[currentIndex];
+            if (!unknownWords.find(w => w.word === word.word)) {
+                unknownWords.push(word);
+            }
+            knownWords = knownWords.filter(w => w.word !== word.word);
+            saveData();
+            nextCard();
         }
 
         function nextCard() {
-            if (currentIndex < cards.length - 1) {
+            const workingList = getCurrentWorkingList();
+            if (currentIndex < workingList.length - 1) {
                 currentIndex++;
-                displayCard();
+            } else {
+                currentIndex = 0;
             }
+            saveData();
+            displayCard();
         }
 
         function previousCard() {
+            const workingList = getCurrentWorkingList();
             if (currentIndex > 0) {
                 currentIndex--;
-                displayCard();
+            } else {
+                currentIndex = workingList.length - 1;
             }
+            saveData();
+            displayCard();
         }
 
         function shuffleCards() {
-            for (let i = cards.length - 1; i > 0; i--) {
+            const workingList = getCurrentWorkingList();
+            for (let i = workingList.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [cards[i], cards[j]] = [cards[j], cards[i]];
+                [workingList[i], workingList[j]] = [workingList[j], workingList[i]];
             }
+            currentIndex = 0;
+            saveData();
+            displayCard();
+        }
+
+        function resetStudy() {
             currentIndex = 0;
             displayCard();
         }
 
-        function resetCards() {
-            cards = [...vocabularyData];
-            currentIndex = 0;
-            displayCard();
+        function updateProgress() {
+            const total = allWords.length;
+            const known = knownWords.length;
+            const unknown = unknownWords.length;
+            const progress = total > 0 ? Math.round((known / total) * 100) : 0;
+
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('currentCard').textContent = (currentIndex + 1) + '/' + (getCurrentWorkingList().length || 1);
+            document.getElementById('knownCount').textContent = known;
+            document.getElementById('unknownCount').textContent = unknown;
         }
 
-        // Add click listener to flip card
-        document.getElementById('cardContainer').addEventListener('click', flipCard);
+        function calculateAccuracy() {
+            const total = allWords.length;
+            const known = knownWords.length;
+            const accuracy = total > 0 ? Math.round((known / total) * 100) : 0;
+            alert(`Accuracy: ${accuracy}% (${known}/${total} words known)`);
+        }
 
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') nextCard();
-            if (e.key === 'ArrowLeft') previousCard();
-            if (e.key === ' ') {
-                e.preventDefault();
-                flipCard();
+        function updateReviewList() {
+            const reviewList = document.getElementById('reviewList');
+            const reviewEmpty = document.getElementById('reviewEmpty');
+
+            if (unknownWords.length === 0) {
+                reviewList.innerHTML = '';
+                reviewEmpty.style.display = 'flex';
+            } else {
+                reviewEmpty.style.display = 'none';
+                reviewList.innerHTML = unknownWords.map((word, index) => `
+                    <div class="word-item">
+                        <div class="word-info">
+                            <div class="word-title">${word.word}</div>
+                            <div class="word-subtitle">${word.chinese}</div>
+                        </div>
+                        <div class="word-actions">
+                            <button class="btn-sm btn-primary" onclick="markKnownFromReview(${index})">✅</button>
+                            <button class="btn-sm btn-danger" onclick="deleteUnknownWord(${index})">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
             }
+        }
+
+        function markKnownFromReview(index) {
+            const word = unknownWords[index];
+            knownWords.push(word);
+            unknownWords.splice(index, 1);
+            saveData();
+            updateReviewList();
+            updateProgress();
+        }
+
+        function deleteUnknownWord(index) {
+            unknownWords.splice(index, 1);
+            saveData();
+            updateReviewList();
+            updateProgress();
+        }
+
+        function updateCustomList() {
+            const customList = document.getElementById('customList');
+            const customEmpty = document.getElementById('customEmpty');
+
+            if (customWords.length === 0) {
+                customList.innerHTML = '';
+                customEmpty.style.display = 'flex';
+            } else {
+                customEmpty.style.display = 'none';
+                customList.innerHTML = customWords.map((word, index) => `
+                    <div class="word-item">
+                        <div class="word-info">
+                            <div class="word-title">${word.word}</div>
+                            <div class="word-subtitle">${word.chinese}</div>
+                        </div>
+                        <div class="word-actions">
+                            <button class="btn-sm btn-info" onclick="editCustomWord(${index})">✏️</button>
+                            <button class="btn-sm btn-danger" onclick="deleteCustomWord(${index})">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function openAddWordModal() {
+            document.getElementById('addWordModal').classList.add('active');
+        }
+
+        function closeAddWordModal() {
+            document.getElementById('addWordModal').classList.remove('active');
+            document.getElementById('customWord').value = '';
+            document.getElementById('customChinese').value = '';
+            document.getElementById('customDefinition').value = '';
+            document.getElementById('customExample').value = '';
+        }
+
+        function saveCustomWord(event) {
+            event.preventDefault();
+            
+            const word = {
+                word: document.getElementById('customWord').value,
+                chinese: document.getElementById('customChinese').value,
+                definition: document.getElementById('customDefinition').value,
+                example: document.getElementById('customExample').value,
+                pronunciation: ''
+            };
+
+            customWords.push(word);
+            allWords.push(word);
+            saveData();
+            updateCustomList();
+            updateProgress();
+            closeAddWordModal();
+        }
+
+        function editCustomWord(index) {
+            const word = customWords[index];
+            document.getElementById('customWord').value = word.word;
+            document.getElementById('customChinese').value = word.chinese;
+            document.getElementById('customDefinition').value = word.definition || '';
+            document.getElementById('customExample').value = word.example || '';
+            openAddWordModal();
+        }
+
+        function deleteCustomWord(index) {
+            const word = customWords[index];
+            if (confirm(`Delete "${word.word}"?`)) {
+                customWords.splice(index, 1);
+                allWords = allWords.filter(w => w.word !== word.word);
+                saveData();
+                updateCustomList();
+                updateProgress();
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(tabName + '-screen').classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'review') updateReviewList();
+            if (tabName === 'custom') updateCustomList();
+        }
+
+        function exportData() {
+            const data = {
+                allWords,
+                knownWords,
+                unknownWords,
+                customWords,
+                timestamp: new Date().toISOString()
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `vocabulary-backup-${Date.now()}.json`;
+            a.click();
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                localStorage.clear();
+                allWords = [];
+                knownWords = [];
+                unknownWords = [];
+                customWords = [];
+                currentIndex = 0;
+                initApp();
+                alert('All data cleared.');
+            }
+        }
+
+        // Flip card on tap
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('flashcard').addEventListener('click', flipCard);
+            initApp();
         });
-
-        // Initialize the app
-        initializeApp();
     </script>
 </body>
 </html>
