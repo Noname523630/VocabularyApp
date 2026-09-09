@@ -102,7 +102,7 @@
     .card-inner{
       width:100%;height:100%;border-radius:calc(var(--radius) - 2px);position:relative;transition:opacity 240ms var(--ease), transform 240ms var(--ease);
     }
-    .flashcard.flipped .card-inner{ /* use subtle lift instead of heavy 3D */ transform: translateY(-6px); }
+    .flashcard.flipped .card-inner{ /* use subtle lift instead of heavy 3D */ transform: translateY(-6px); opacity:0.98 }
 
     .card-face{position:absolute;inset:0;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center}
     .face-front{color:var(--text)}
@@ -333,43 +333,35 @@
     const STORAGE_KEYS = {all:'allWords', known:'knownWords', unknown:'unknownWords', custom:'customWords', idx:'currentIndex'};
 
     const defaultWords = [
-      // IELTS & academic high-frequency words
       {word: "Analyze", chinese: "分析", definition: "Examine methodically and in detail.", pronunciation: "/ˈænəlaɪz/", example: "The study aims to analyze the data."},
       {word: "Assess", chinese: "評估", definition: "Evaluate or estimate the nature, ability, or quality of.", pronunciation: "/əˈsɛs/", example: "We need to assess the impact."},
-      {word: "Significant", chinese: "重要的；顯著的", definition: "Sufficiently great or important to be worthy of attention.", pronunciation: "/sɪɡˈnɪfɪkənt/", example: "There was [...]"},
+      {word: "Significant", chinese: "重要的；顯著的", definition: "Sufficiently great or important to be worthy of attention.", pronunciation: "/sɪɡˈnɪfɪkənt/", example: "There was a significant increase."},
       {word: "Coherent", chinese: "連貫的", definition: "Logical and consistent.", pronunciation: "/kəʊˈhɪərənt/", example: "The argument was coherent."},
       {word: "Sufficient", chinese: "足夠的", definition: "Enough; adequate.", pronunciation: "/səˈfɪʃənt/", example: "There is sufficient evidence."},
-      {word: "Illustrate", chinese: "說明；闡明", definition: "Explain or make (something) clear by using examples.", pronunciation: "/ˈɪləstreɪt/", example: "The diagram helps illustrat[...]"},
-      {word: "Implication", chinese: "含意；可能的影響", definition: "A possible effect or result of an action or a decision.", pronunciation: "/ˌɪmplɪˈkeɪʃən/", example: "Consider[...]"},
-      {word: "Hypothesis", chinese: "假設", definition: "A proposed explanation made on the basis of limited evidence.", pronunciation: "/haɪˈpɒθəsɪs/", example: "The hypothesis was teste[...]"},
-      {word: "Sustainable", chinese: "可持續的", definition: "Able to be maintained at a certain rate or level.", pronunciation: "/səˈsteɪnəbəl/", example: "We aim for sustainable growth[...]"},
-      {word: "Aggregate", chinese: "總計；集成", definition: "Formed or calculated by the combination of several separate elements.", pronunciation: "/ˈæɡrɪɡət/", example: "Aggregate d[...]"},
-      {word: "Interpret", chinese: "解釋；闡釋", definition: "Explain the meaning of (information or actions).", pronunciation: "/ɪnˈtɜːprət/", example: "How do you interpret these resu[...]"},
-      {word: "Evaluate", chinese: "評價；估價", definition: "Form an idea of the amount, number, or value of; assess.", pronunciation: "/ɪˈvæljueɪt/", example: "We need to evaluate the o[...]"},
-      {word: "Concept", chinese: "概念", definition: "An abstract idea; a general notion.", pronunciation: "/ˈkɒnsɛpt/", example: "The concept was difficult to grasp."},
-      {word: "Evidence", chinese: "證據", definition: "The available body of facts indicating whether a belief is true.", pronunciation: "/ˈɛvɪdəns/", example: "There is little evidence to [...]"},
+      {word: "Illustrate", chinese: "說明；闡明", definition: "Explain or make clear by using examples.", pronunciation: "/ˈɪləstreɪt/", example: "The diagram helps illustrate the process."},
+      {word: "Implication", chinese: "含意；可能的影響", definition: "A possible effect or result of an action or decision.", pronunciation: "/ˌɪmplɪˈkeɪʃən/", example: "Consider the implications of this policy."},
+      {word: "Hypothesis", chinese: "假設", definition: "A proposed explanation based on limited evidence.", pronunciation: "/haɪˈpɒθəsɪs/", example: "The hypothesis was tested in the experiment."},
+      {word: "Sustainable", chinese: "可持續的", definition: "Able to be maintained at a certain rate or level.", pronunciation: "/səˈsteɪnəbəl/", example: "We aim for sustainable growth."},
+      {word: "Aggregate", chinese: "總計；集成", definition: "Formed by the combination of several elements.", pronunciation: "/ˈæɡrɪɡət/", example: "Aggregate data provides an overview."},
+      {word: "Interpret", chinese: "解釋；闡釋", definition: "Explain the meaning of information or actions.", pronunciation: "/ɪnˈtɜːprət/", example: "How do you interpret these results?"},
+      {word: "Evaluate", chinese: "評價；估價", definition: "Form an idea of the amount, number, or value of; assess.", pronunciation: "/ɪˈvæljueɪt/", example: "We need to evaluate the outcomes."},
+      {word: "Concept", chinese: "概念", definition: "An abstract idea or general notion.", pronunciation: "/ˈkɒnsɛpt/", example: "The concept was difficult to grasp."},
+      {word: "Evidence", chinese: "證據", definition: "Facts indicating whether a belief is true.", pronunciation: "/ˈɛvɪdəns/", example: "There is little evidence to support that claim."},
       {word: "Context", chinese: "語境；背景", definition: "The circumstances that form the setting for an event.", pronunciation: "/ˈkɒntɛkst/", example: "Place the data in context."},
-      {word: "Trend", chinese: "趨勢", definition: "A general direction in which something is developing.", pronunciation: "/trɛnd/", example: "The trend shows improvement."},
-      {word: "Contrast", chinese: "對比；對照", definition: "Compare in such a way as to emphasize differences.", pronunciation: "/ˈkɒntrɑːst/", example: "Contrast the two approaches."},
-      {word: "Factor", chinese: "因素", definition: "A circumstance, fact, or influence that contributes to a result.", pronunciation: "/ˈfæktə/", example: "Cost is a major factor."},
+      {word: "Trend", chinese: "趨勢", definition: "A general direction in which something develops.", pronunciation: "/trɛnd/", example: "The trend shows improvement."},
+      {word: "Contrast", chinese: "對比；對照", definition: "Compare to emphasize differences.", pronunciation: "/ˈkɒntrɑːst/", example: "Contrast the two approaches."},
+      {word: "Factor", chinese: "因素", definition: "A circumstance that contributes to a result.", pronunciation: "/ˈfæktə/", example: "Cost is a major factor."},
       {word: "Establish", chinese: "建立；確定", definition: "Set up on a firm or permanent basis.", pronunciation: "/ɪˈstæblɪʃ/", example: "They established a new procedure."},
-      {word: "Emphasize", chinese: "強調", definition: "Give special importance to something in speaking or writing.", pronunciation: "/ˈɛmfəsaɪz/", example: "The report emphasizes quality.[...]"},
       {word: "Method", chinese: "方法；方式", definition: "A particular procedure for accomplishing something.", pronunciation: "/ˈmɛθəd/", example: "Use a scientific method."},
-      {word: "Framework", chinese: "框架；構架", definition: "A basic structure underlying a system or concept.", pronunciation: "/ˈfreɪmwɜːk/", example: "The theoretical framework is ro[...]"},
-      // Accounting & finance terms
-      {word: "Asset", chinese: "資產", definition: "A resource with economic value owned by an individual or corporation.", pronunciation: "/ˈæsɛt/", example: "The company sold some assets[...]"},
+      {word: "Asset", chinese: "資產", definition: "A resource with economic value.", pronunciation: "/ˈæsɛt/", example: "The company sold some assets."},
       {word: "Liability", chinese: "負債", definition: "A company's legal debts or obligations.", pronunciation: "/ˌlaɪəˈbɪlɪti/", example: "Long-term liabilities rose."},
-      {word: "Revenue", chinese: "營收；收入", definition: "Income generated from normal business operations.", pronunciation: "/ˈrɛvəˌnuː/", example: "Annual revenue increased."},
-      {word: "Expense", chinese: "費用；支出", definition: "The economic costs a business incurs through operations.", pronunciation: "/ɪkˈspɛns/", example: "Reduce operating expenses."},
-      {word: "Depreciation", chinese: "折舊", definition: "A reduction in the value of an asset over time.", pronunciation: "/dɪˌpriːʃiˈeɪʃən/", example: "Depreciation affects net incom[...]"},
-      {word: "Accrual", chinese: "應計；應計項目", definition: "An accounting method that records revenues when earned and expenses when incurred.", pronunciation: "/əˈkruːəl/", exampl[...]},
-      {word: "Audit", chinese: "稽核；查帳", definition: "An official inspection of an organization's accounts.", pronunciation: "/ˈɔːdɪt/", example: "The audit was completed."},
+      {word: "Revenue", chinese: "營收；收入", definition: "Income generated from business operations.", pronunciation: "/ˈrɛvəˌnuː/", example: "Annual revenue increased."},
+      {word: "Expense", chinese: "費用；支出", definition: "The economic costs a business incurs.", pronunciation: "/ɪkˈspɛns/", example: "Reduce operating expenses."},
+      {word: "Depreciation", chinese: "折舊", definition: "A reduction in the value of an asset over time.", pronunciation: "/dɪˌpriːʃiˈeɪʃən/", example: "Depreciation affects net income."},
+      {word: "Audit", chinese: "稽核；查帳", definition: "An official inspection of accounts.", pronunciation: "/ˈɔːdɪt/", example: "The audit was completed."},
       {word: "Equity", chinese: "權益；股東權益", definition: "The value of shares issued by a company.", pronunciation: "/ˈekwɪti/", example: "Shareholders' equity increased."},
-      {word: "Journal", chinese: "日誌；日記帳", definition: "A record of financial transactions in chronological order.", pronunciation: "/ˈdʒɜːrnəl/", example: "Post the entries to t[...]"},
-      {word: "Ledger", chinese: "總帳", definition: "A book or other collection of financial accounts.", pronunciation: "/ˈlɛdʒər/", example: "Update the general ledger."},
-      {word: "Cash flow", chinese: "現金流量", definition: "Total amount of money being transferred into and out of a business.", pronunciation: "/kæʃ floʊ/", example: "Positive cash flow [...]"},
-      {word: "Inventory", chinese: "存貨", definition: "The raw materials, work-in-progress, and finished goods.", pronunciation: "/ˈɪnvəntəri/", example: "Inventory levels were reduced."},
-      {word: "Capital", chinese: "資本；資金", definition: "Wealth in the form of money or assets.", pronunciation: "/ˈkæpɪtl/", example: "They raised capital for expansion."}
+      {word: "Ledger", chinese: "總帳", definition: "A book containing financial accounts.", pronunciation: "/ˈlɛdʒər/", example: "Update the general ledger."},
+      {word: "Inventory", chinese: "存貨", definition: "Raw materials, work-in-progress, and finished goods.", pronunciation: "/ˈɪnvəntəri/", example: "Inventory levels were reduced."}
     ];
 
     let allWords=[], knownWords=[], unknownWords=[], customWords=[], currentIndex=0;
@@ -420,11 +412,20 @@
 
     /* Init */
     function loadData(){
-      allWords = JSON.parse(localStorage.getItem(STORAGE_KEYS.all)) || [];
-      knownWords = JSON.parse(localStorage.getItem(STORAGE_KEYS.known)) || [];
-      unknownWords = JSON.parse(localStorage.getItem(STORAGE_KEYS.unknown)) || [];
-      customWords = JSON.parse(localStorage.getItem(STORAGE_KEYS.custom)) || [];
-      currentIndex = parseInt(localStorage.getItem(STORAGE_KEYS.idx)) || 0;
+      try{
+        allWords = JSON.parse(localStorage.getItem(STORAGE_KEYS.all)) || [];
+        knownWords = JSON.parse(localStorage.getItem(STORAGE_KEYS.known)) || [];
+        unknownWords = JSON.parse(localStorage.getItem(STORAGE_KEYS.unknown)) || [];
+        customWords = JSON.parse(localStorage.getItem(STORAGE_KEYS.custom)) || [];
+        currentIndex = parseInt(localStorage.getItem(STORAGE_KEYS.idx)) || 0;
+      }catch(e){
+        // if parsing fails, clear and reset
+        allWords = [];
+        knownWords = [];
+        unknownWords = [];
+        customWords = [];
+        currentIndex = 0;
+      }
 
       if(!allWords || allWords.length===0){
         allWords = JSON.parse(JSON.stringify(defaultWords));
@@ -475,7 +476,7 @@
       const known = knownWords.length || 0;
       const unknown = unknownWords.length || 0;
       const progress = total>0 ? Math.round((known/total)*100) : 0;
-      currentCard.textContent = `${currentIndex+1} / ${getWorkingList().length}`;
+      currentCard.textContent = `${Math.min(currentIndex+1, getWorkingList().length)} / ${getWorkingList().length}`;
       progressFill.style.width = progress+'%';
       knownCountEl.textContent = known;
       unknownCountEl.textContent = unknown;
@@ -505,8 +506,6 @@
     function nextCard(){
       const list = getWorkingList();
       if(list.length===0) return;
-      flashcard.classList.add('swipe-next');
-      setTimeout(()=>{ flashcard.classList.remove('swipe-next'); },300);
       currentIndex = (currentIndex < list.length-1) ? currentIndex+1 : 0;
       renderCard();
     }
@@ -534,17 +533,17 @@
       if(!unknownWords.find(x=>x.word===w.word)) unknownWords.push(w);
       knownWords = knownWords.filter(x=>x.word!==w.word);
       saveData();
-      // flip and remain on the same card (Chinese meaning removed from card back per request)
+      // flip and remain on the same card
       flashcard.classList.add('flipped');
       updateStats();
     }
 
     /* Shuffle & Reset */
     function shuffle(){
-      const list = getWorkingList();
-      for(let i=list.length-1;i>0;i--){
-        const j=Math.floor(Math.random()*(i+1));
-        [list[i],list[j]]=[list[j],list[i]];
+      // simple Fisher-Yates on allWords (but keep unknownWords separate)
+      for(let i=allWords.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [allWords[i], allWords[j]] = [allWords[j], allWords[i]];
       }
       currentIndex=0; renderCard(); saveData();
     }
@@ -564,10 +563,18 @@
       if(unknownWords.length===0){ reviewEmpty.style.display='block'; return;} else reviewEmpty.style.display='none';
       unknownWords.forEach((w,i)=>{
         const el = document.createElement('div'); el.className='list-item';
-        el.innerHTML = `<div class="list-left"><div class="list-title">${w.word}</div><div class="list-sub">${w.chinese}</div></div>`;
+        el.innerHTML = `<div class="list-left"><div class="list-title">${escapeHtml(w.word)}</div><div class="list-sub">${escapeHtml(w.chinese||'')}</div></div>`;
         const actions = document.createElement('div'); actions.className='list-actions';
-        const mark = document.createElement('button'); mark.className='pill'; mark.textContent='已掌握'; mark.onclick=()=>{ knownWords.push(w); unknownWords.splice(i,1); saveData(); renderRevi[...] 
-        const del = document.createElement('button'); del.className='pill'; del.textContent='刪除'; del.onclick=()=>{ if(confirm('確定刪除？')){ unknownWords.splice(i,1); saveData(); rende[...] 
+        const mark = document.createElement('button'); mark.className='pill'; mark.textContent='已掌握';
+        mark.addEventListener('click', ()=>{
+          knownWords.push(w);
+          unknownWords.splice(i,1);
+          saveData(); renderReview(); updateStats();
+        });
+        const del = document.createElement('button'); del.className='pill'; del.textContent='刪除';
+        del.addEventListener('click', ()=>{
+          if(confirm('確定刪除？')){ unknownWords.splice(i,1); saveData(); renderReview(); updateStats(); }
+        });
         actions.appendChild(mark); actions.appendChild(del);
         el.appendChild(actions); reviewList.appendChild(el);
       });
@@ -579,10 +586,19 @@
       if(customWords.length===0){ customEmpty.style.display='block'; return;} else customEmpty.style.display='none';
       customWords.forEach((w,i)=>{
         const el = document.createElement('div'); el.className='list-item';
-        el.innerHTML = `<div class="list-left"><div class="list-title">${w.word}</div><div class="list-sub">${w.chinese}</div></div>`;
+        el.innerHTML = `<div class="list-left"><div class="list-title">${escapeHtml(w.word)}</div><div class="list-sub">${escapeHtml(w.chinese||'')}</div></div>`;
         const actions = document.createElement('div'); actions.className='list-actions';
-        const edit = document.createElement('button'); edit.className='pill'; edit.textContent='編輯'; edit.onclick=()=>{ openModalForEdit(i); };
-        const del = document.createElement('button'); del.className='pill'; del.textContent='刪除'; del.onclick=()=>{ if(confirm('確定刪除？')){ customWords.splice(i,1); allWords = allWord[...] 
+        const edit = document.createElement('button'); edit.className='pill'; edit.textContent='編輯';
+        edit.addEventListener('click', ()=>{ openModalForEdit(i); });
+        const del = document.createElement('button'); del.className='pill'; del.textContent='刪除';
+        del.addEventListener('click', ()=>{
+          if(confirm('確定刪除？')){
+            const removed = customWords.splice(i,1)[0];
+            // remove from allWords as well (match by word)
+            allWords = allWords.filter(x=> x.word !== removed.word);
+            saveData(); renderCustom(); updateStats(); renderCard();
+          }
+        });
         actions.appendChild(edit); actions.appendChild(del);
         el.appendChild(actions); customList.appendChild(el);
       });
@@ -591,7 +607,14 @@
     /* Modal actions */
     function openModal(){ modal.classList.add('active'); }
     function closeModal(){ modal.classList.remove('active'); editIndex=null; wordForm.reset(); }
-    function openModalForEdit(i){ editIndex=i; const w = customWords[i]; fWord.value=w.word; fChinese.value=w.chinese; fDefinition.value=w.definition||''; fExample.value=w.example||''; openModal([...]
+    function openModalForEdit(i){
+      editIndex=i; const w = customWords[i];
+      fWord.value = w.word || '';
+      fChinese.value = w.chinese || '';
+      fDefinition.value = w.definition || '';
+      fExample.value = w.example || '';
+      openModal();
+    }
 
     wordForm.addEventListener('submit',(e)=>{
       e.preventDefault();
@@ -600,9 +623,8 @@
       if(editIndex===null){
         customWords.push(wordObj); allWords.push(wordObj);
       } else {
-        // update custom and allWords
         const prev = customWords[editIndex];
-        customWords[editIndex]=wordObj;
+        customWords[editIndex] = wordObj;
         allWords = allWords.map(w=> w.word===prev.word ? wordObj : w);
       }
       saveData(); renderCustom(); updateStats(); renderCard(); closeModal();
@@ -629,7 +651,16 @@
     });
     document.getElementById('btnClear').addEventListener('click',()=>{
       if(confirm('清除所有本地資料？此動作無法還原。')){
-        localStorage.removeItem(STORAGE_KEYS.all); localStorage.removeItem(STORAGE_KEYS.known); localStorage.removeItem(STORAGE_KEYS.unknown); localStorage.removeItem(STORAGE_KEYS.custom); localS[...] 
+        localStorage.removeItem(STORAGE_KEYS.all);
+        localStorage.removeItem(STORAGE_KEYS.known);
+        localStorage.removeItem(STORAGE_KEYS.unknown);
+        localStorage.removeItem(STORAGE_KEYS.custom);
+        localStorage.removeItem(STORAGE_KEYS.idx);
+        allWords = [];
+        knownWords = [];
+        unknownWords = [];
+        customWords = [];
+        currentIndex = 0;
         loadData(); renderCustom(); renderReview(); renderCard(); updateStats();
       }
     });
@@ -662,12 +693,17 @@
     window.resetStudy = resetStudy;
     window.calculateAccuracy = calculateAccuracy;
     window.nextCard = nextCard;
-    window.previousCard = previousCard;
+    window.previousCard = prevCard;
     window.markKnown = markKnown;
     window.markUnknown = markUnknown;
 
+    /* small helper */
+    function escapeHtml(str){
+      if(!str) return '';
+      return String(str).replace(/[&<>"']/g, s=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s]));
+    }
+
   </script>
 
-  <!-- redeploy: trigger GitHub Pages rebuild -->
 </body>
 </html>
