@@ -109,7 +109,6 @@
     .word-large{font-size:44px;font-weight:700;letter-spacing:0.6px}
     .pron-small{font-size:13px;color:var(--muted);margin-top:6px}
 
-    .meaning{font-size:22px;color:var(--sage);margin-top:6px;font-weight:600}
     .def{margin-top:8px;font-size:14px;color:var(--dusty);line-height:1.5}
     .example{margin-top:12px;font-size:13px;color:var(--muted);background:rgba(139,150,161,0.04);padding:10px;border-radius:10px;border-left:3px solid rgba(154,168,154,0.18)}
 
@@ -215,7 +214,6 @@
                   <div class="pron-small" id="pronunciationSmall"></div>
                 </div>
                 <div class="card-face face-back" id="faceBack">
-                  <div class="meaning" id="chineseDisplay">中文釋義</div>
                   <div class="def" id="definitionDisplay">英文定義</div>
                   <div class="example" id="exampleDisplay">例句</div>
                 </div>
@@ -346,7 +344,7 @@
       {word: "Evidence", chinese: "證據", definition: "The available body of facts indicating whether a belief is true.", pronunciation: "/ˈɛvɪdəns/", example: "There is little evidence to support the claim."},
       {word: "Context", chinese: "語境；背景", definition: "The circumstances that form the setting for an event.", pronunciation: "/ˈkɒntɛkst/", example: "Place the data in context."},
       {word: "Trend", chinese: "趨勢", definition: "A general direction in which something is developing.", pronunciation: "/trɛnd/", example: "The trend shows improvement."},
-      {word: "Contrast", chinese: "對比；對照", definition: "Compare in such a way as to emphasize differences.", pronunciation: "/ˈkɒntr��ːst/", example: "Contrast the two approaches."},
+      {word: "Contrast", chinese: "對比；對照", definition: "Compare in such a way as to emphasize differences.", pronunciation: "/ˈkɒntrɑːst/", example: "Contrast the two approaches."},
       {word: "Factor", chinese: "因素", definition: "A circumstance, fact, or influence that contributes to a result.", pronunciation: "/ˈfæktə/", example: "Cost is a major factor."},
       {word: "Establish", chinese: "建立；確定", definition: "Set up on a firm or permanent basis.", pronunciation: "/ɪˈstæblɪʃ/", example: "They established a new procedure."},
       {word: "Emphasize", chinese: "強調", definition: "Give special importance to something in speaking or writing.", pronunciation: "/ˈɛmfəsaɪz/", example: "The report emphasizes quality."},
@@ -379,7 +377,6 @@
 
     const wordDisplay = document.getElementById('wordDisplay');
     const pronunciationSmall = document.getElementById('pronunciationSmall');
-    const chineseDisplay = document.getElementById('chineseDisplay');
     const definitionDisplay = document.getElementById('definitionDisplay');
     const exampleDisplay = document.getElementById('exampleDisplay');
     const progressFill = document.getElementById('progressFill');
@@ -449,7 +446,6 @@
       if(list.length===0){
         wordDisplay.textContent='無詞彙';
         pronunciationSmall.textContent='';
-        chineseDisplay.textContent='';
         definitionDisplay.textContent='';
         exampleDisplay.textContent='';
         currentCard.textContent = '0 / 0';
@@ -460,7 +456,6 @@
       const card = list[currentIndex];
       wordDisplay.textContent = card.word || '';
       pronunciationSmall.textContent = card.pronunciation || '';
-      chineseDisplay.textContent = card.chinese || '';
       definitionDisplay.textContent = card.definition || '無英文定義';
       exampleDisplay.textContent = card.example || '無例句';
       // reset flip
@@ -528,7 +523,7 @@
       if(!unknownWords.find(x=>x.word===w.word)) unknownWords.push(w);
       knownWords = knownWords.filter(x=>x.word!==w.word);
       saveData();
-      // flip and remain on the same card (user will press "下一個" manually)
+      // flip and remain on the same card (Chinese meaning removed from card back per request)
       flashcard.classList.add('flipped');
       updateStats();
     }
