@@ -112,8 +112,8 @@
     .def{margin-top:8px;font-size:14px;color:var(--dusty);line-height:1.5}
     .example{margin-top:12px;font-size:13px;color:var(--muted);background:rgba(139,150,161,0.04);padding:10px;border-radius:10px;border-left:3px solid rgba(154,168,154,0.18)}
 
-    /* center flip hint */
-    .flip-hint-centered{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:var(--muted);font-size:13px;pointer-events:none}
+    /* center flip hint moved to bottom to avoid overlap with the word */
+    .flip-hint-centered{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);color:var(--muted);font-size:13px;pointer-events:none}
 
     /* Controls */
     .controls{display:flex;flex-direction:column;gap:10px;padding:6px}
@@ -159,6 +159,7 @@
       .card-outer{padding:8px}
       .segmented{padding:4px}
       .stat-value{font-size:16px}
+      .flip-hint-centered{bottom:8px;font-size:12px}
     }
 
     /* reduced motion */
