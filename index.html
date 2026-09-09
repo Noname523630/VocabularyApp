@@ -113,6 +113,9 @@
     .def{margin-top:8px;font-size:14px;color:var(--dusty);line-height:1.5}
     .example{margin-top:12px;font-size:13px;color:var(--muted);background:rgba(139,150,161,0.04);padding:10px;border-radius:10px;border-left:3px solid rgba(154,168,154,0.18)}
 
+    /* center flip hint */
+    .flip-hint-centered{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:var(--muted);font-size:13px;pointer-events:none}
+
     /* Controls */
     .controls{display:flex;flex-direction:column;gap:10px;padding:6px}
     .main-actions{display:flex;gap:10px}
@@ -207,6 +210,7 @@
             <div class="flashcard" id="flashcard" aria-live="polite">
               <div class="card-inner" id="cardInner">
                 <div class="card-face face-front" id="faceFront">
+                  <div class="flip-hint-centered">點擊卡片顯示解答</div>
                   <div class="word-large" id="wordDisplay">Word</div>
                   <div class="pron-small" id="pronunciationSmall"></div>
                 </div>
@@ -325,7 +329,7 @@
     const STORAGE_KEYS = {all:'allWords', known:'knownWords', unknown:'unknownWords', custom:'customWords', idx:'currentIndex'};
 
     const defaultWords = [
-      // IELTS 高频学术词 & Accounting terms (Traditional Chinese meanings)
+      // IELTS & academic high-frequency words
       {word: "Analyze", chinese: "分析", definition: "Examine methodically and in detail.", pronunciation: "/ˈænəlaɪz/", example: "The study aims to analyze the data."},
       {word: "Assess", chinese: "評估", definition: "Evaluate or estimate the nature, ability, or quality of.", pronunciation: "/əˈsɛs/", example: "We need to assess the impact."},
       {word: "Significant", chinese: "重要的；顯著的", definition: "Sufficiently great or important to be worthy of attention.", pronunciation: "/sɪɡˈnɪfɪkənt/", example: "There was a significant increase."},
@@ -336,7 +340,19 @@
       {word: "Hypothesis", chinese: "假設", definition: "A proposed explanation made on the basis of limited evidence.", pronunciation: "/haɪˈpɒθəsɪs/", example: "The hypothesis was tested."},
       {word: "Sustainable", chinese: "可持續的", definition: "Able to be maintained at a certain rate or level.", pronunciation: "/səˈsteɪnəbəl/", example: "We aim for sustainable growth."},
       {word: "Aggregate", chinese: "總計；集成", definition: "Formed or calculated by the combination of several separate elements.", pronunciation: "/ˈæɡrɪɡət/", example: "Aggregate demand increased."},
-      // Accounting-specific
+      {word: "Interpret", chinese: "解釋；闡釋", definition: "Explain the meaning of (information or actions).", pronunciation: "/ɪnˈtɜːprət/", example: "How do you interpret these results?"},
+      {word: "Evaluate", chinese: "評價；估價", definition: "Form an idea of the amount, number, or value of; assess.", pronunciation: "/ɪˈvæljueɪt/", example: "We need to evaluate the options."},
+      {word: "Concept", chinese: "概念", definition: "An abstract idea; a general notion.", pronunciation: "/ˈkɒnsɛpt/", example: "The concept was difficult to grasp."},
+      {word: "Evidence", chinese: "證據", definition: "The available body of facts indicating whether a belief is true.", pronunciation: "/ˈɛvɪdəns/", example: "There is little evidence to support the claim."},
+      {word: "Context", chinese: "語境；背景", definition: "The circumstances that form the setting for an event.", pronunciation: "/ˈkɒntɛkst/", example: "Place the data in context."},
+      {word: "Trend", chinese: "趨勢", definition: "A general direction in which something is developing.", pronunciation: "/trɛnd/", example: "The trend shows improvement."},
+      {word: "Contrast", chinese: "對比；對照", definition: "Compare in such a way as to emphasize differences.", pronunciation: "/ˈkɒntr��ːst/", example: "Contrast the two approaches."},
+      {word: "Factor", chinese: "因素", definition: "A circumstance, fact, or influence that contributes to a result.", pronunciation: "/ˈfæktə/", example: "Cost is a major factor."},
+      {word: "Establish", chinese: "建立；確定", definition: "Set up on a firm or permanent basis.", pronunciation: "/ɪˈstæblɪʃ/", example: "They established a new procedure."},
+      {word: "Emphasize", chinese: "強調", definition: "Give special importance to something in speaking or writing.", pronunciation: "/ˈɛmfəsaɪz/", example: "The report emphasizes quality."},
+      {word: "Method", chinese: "方法；方式", definition: "A particular procedure for accomplishing something.", pronunciation: "/ˈmɛθəd/", example: "Use a scientific method."},
+      {word: "Framework", chinese: "框架；構架", definition: "A basic structure underlying a system or concept.", pronunciation: "/ˈfreɪmwɜːk/", example: "The theoretical framework is robust."},
+      // Accounting & finance terms
       {word: "Asset", chinese: "資產", definition: "A resource with economic value owned by an individual or corporation.", pronunciation: "/ˈæsɛt/", example: "The company sold some assets."},
       {word: "Liability", chinese: "負債", definition: "A company's legal debts or obligations.", pronunciation: "/ˌlaɪəˈbɪlɪti/", example: "Long-term liabilities rose."},
       {word: "Revenue", chinese: "營收；收入", definition: "Income generated from normal business operations.", pronunciation: "/ˈrɛvəˌnuː/", example: "Annual revenue increased."},
@@ -344,7 +360,12 @@
       {word: "Depreciation", chinese: "折舊", definition: "A reduction in the value of an asset over time.", pronunciation: "/dɪˌpriːʃiˈeɪʃən/", example: "Depreciation affects net income."},
       {word: "Accrual", chinese: "應計；應計項目", definition: "An accounting method that records revenues when earned and expenses when incurred.", pronunciation: "/əˈkruːəl/", example: "Use accrual accounting principles."},
       {word: "Audit", chinese: "稽核；查帳", definition: "An official inspection of an organization's accounts.", pronunciation: "/ˈɔːdɪt/", example: "The audit was completed."},
-      {word: "Equity", chinese: "權益；股東權益", definition: "The value of shares issued by a company.", pronunciation: "/ˈekwɪti/", example: "Shareholders' equity increased."}
+      {word: "Equity", chinese: "權益；股東權益", definition: "The value of shares issued by a company.", pronunciation: "/ˈekwɪti/", example: "Shareholders' equity increased."},
+      {word: "Journal", chinese: "日誌；日記帳", definition: "A record of financial transactions in chronological order.", pronunciation: "/ˈdʒɜːrnəl/", example: "Post the entries to the journal."},
+      {word: "Ledger", chinese: "總帳", definition: "A book or other collection of financial accounts.", pronunciation: "/ˈlɛdʒər/", example: "Update the general ledger."},
+      {word: "Cash flow", chinese: "現金流量", definition: "Total amount of money being transferred into and out of a business.", pronunciation: "/kæʃ floʊ/", example: "Positive cash flow is crucial."},
+      {word: "Inventory", chinese: "存貨", definition: "The raw materials, work-in-progress, and finished goods.", pronunciation: "/ˈɪnvəntəri/", example: "Inventory levels were reduced."},
+      {word: "Capital", chinese: "資本；資金", definition: "Wealth in the form of money or assets.", pronunciation: "/ˈkæpɪtl/", example: "They raised capital for expansion."}
     ];
 
     let allWords=[], knownWords=[], unknownWords=[], customWords=[], currentIndex=0;
@@ -507,10 +528,9 @@
       if(!unknownWords.find(x=>x.word===w.word)) unknownWords.push(w);
       knownWords = knownWords.filter(x=>x.word!==w.word);
       saveData();
-      // show chinese meaning immediately by flipping the card, then proceed after short delay
+      // flip and remain on the same card (user will press "下一個" manually)
       flashcard.classList.add('flipped');
       updateStats();
-      setTimeout(()=>{ nextCard(); }, 1400);
     }
 
     /* Shuffle & Reset */
