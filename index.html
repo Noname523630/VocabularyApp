@@ -368,6 +368,8 @@
 
     let allWords=[], knownWords=[], unknownWords=[], customWords=[], currentIndex=0;
     let editIndex = null; // for editing custom words
+    // track words revealed via the first "不認識" click in the two-step flow
+    const revealedUnknown = new Set();
 
     /* Elements */
     const app = document.getElementById('app');
@@ -467,11 +469,16 @@
       const card = list[currentIndex];
       wordDisplay.textContent = card.word || '';
       pronunciationSmall.textContent = card.pronunciation || '';
+      // always populate the chinese behind the card (it will be visible once flipped)
       chineseDisplay.textContent = card.chinese || '';
       definitionDisplay.textContent = card.definition || '無英文定義';
       exampleDisplay.textContent = card.example || '無例句';
-      // reset flip
-      flashcard.classList.remove('flipped');
+      // set flip state according to whether the current word was revealed via the two-step flow
+      if(revealedUnknown.has(card.word)){
+        flashcard.classList.add('flipped');
+      } else {
+        flashcard.classList.remove('flipped');
+      }
       updateStats();
       saveData();
     }
@@ -511,6 +518,9 @@
     function nextCard(){
       const list = getWorkingList();
       if(list.length===0) return;
+      // clear any revealed flag for current word
+      const currentWord = list[currentIndex] && list[currentIndex].word;
+      if(currentWord) revealedUnknown.delete(currentWord);
       currentIndex = (currentIndex < list.length-1) ? currentIndex+1 : 0;
       renderCard();
     }
@@ -521,7 +531,7 @@
       renderCard();
     }
 
-    /* Mark known / unknown */
+    /* Mark known */
     function markKnown(){
       const list = getWorkingList();
       if(list.length===0) return;
@@ -529,23 +539,34 @@
       if(!knownWords.find(x=>x.word===w.word)) knownWords.push(w);
       // ensure it's removed from unknown if present
       unknownWords = unknownWords.filter(x=>x.word!==w.word);
+      // clear any revealed flag
+      revealedUnknown.delete(w.word);
       saveData();
       nextCard();
     }
+
+    /* Mark unknown (two-step flow)
+       First click: reveal Chinese and flip card (no persistence yet)
+       Second click: confirm => persist as unknown, remove from known if present, then advance
+    */
     function markUnknown(){
       const list = getWorkingList();
       if(list.length===0) return;
       const w = list[currentIndex];
-      if(!unknownWords.find(x=>x.word===w.word)) unknownWords.push(w);
-      // only remove from known if it was previously known
-      if(knownWords.find(x=>x.word===w.word)){
+      if(revealedUnknown.has(w.word)){
+        // second click: persist and advance
+        if(!unknownWords.find(x=>x.word===w.word)) unknownWords.push(w);
         knownWords = knownWords.filter(x=>x.word!==w.word);
+        revealedUnknown.delete(w.word);
+        saveData();
+        nextCard();
+      } else {
+        // first click: reveal and do not persist yet
+        revealedUnknown.add(w.word);
+        // ensure chinese content is visible (renderCard keeps chinese populated)
+        flashcard.classList.add('flipped');
+        updateStats();
       }
-      saveData();
-      // flip and show Chinese on back; remain on same card
-      chineseDisplay.textContent = w.chinese || '';
-      flashcard.classList.add('flipped');
-      updateStats();
     }
 
     /* Shuffle & Reset */
