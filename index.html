@@ -40,6 +40,8 @@
       min-height:100vh;
       display:flex;
       flex-direction:column;
+      /* ensure content is above iOS bottom bars */
+      padding-bottom: calc(20px + env(safe-area-inset-bottom));
     }
 
     /* Compact header */
@@ -94,13 +96,13 @@
 
     .flashcard{
       width:100%;height:100%;min-height:260px;background:var(--card-bg);border-radius:var(--radius);border:1px solid var(--border);
-      box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;padding:20px;position:relative;perspective:1200px;overflow:visible
+      box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:visible
     }
 
     .card-inner{
-      width:100%;height:100%;border-radius:calc(var(--radius) - 2px);position:relative;transform-style:preserve-3d;transition:transform 520ms var(--ease);
+      width:100%;height:100%;border-radius:calc(var(--radius) - 2px);position:relative;transition:opacity 240ms var(--ease), transform 240ms var(--ease);
     }
-    .flashcard.flipped .card-inner{transform:rotateY(180deg)}
+    .flashcard.flipped .card-inner{ /* use subtle lift instead of heavy 3D */ transform: translateY(-6px); }
 
     .card-face{position:absolute;inset:0;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center}
     .face-front{color:var(--text)}
@@ -118,7 +120,7 @@
     /* Controls */
     .controls{display:flex;flex-direction:column;gap:10px;padding:6px}
     .main-actions{display:flex;gap:10px}
-    .btn{flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);font-weight:700;font-size:15px;cursor:pointer;background:transparent;color:var(--text);transition:transform 140ms var(--ease),opacity 140ms var(--ease)}
+    .btn{flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);font-weight:700;font-size:15px;cursor:pointer;background:transparent;color:var(--text);transition:transform 140ms var(--ease)}
     .btn:active{transform:scale(0.97)}
     .btn-know{background:linear-gradient(180deg, rgba(154,168,154,0.12), rgba(154,168,154,0.06));color:var(--sage);border-color:rgba(154,168,154,0.16)}
     .btn-unk{background:linear-gradient(180deg, rgba(183,107,87,0.08), rgba(183,107,87,0.04));color:var(--terracotta);border-color:rgba(183,107,87,0.12)}
@@ -147,10 +149,13 @@
     .sheet-actions{display:flex;gap:10px}
 
     /* Bottom nav for mobile */
-    .bottom{padding:12px;background:transparent}
+    .bottom{padding:12px 12px calc(12px + env(safe-area-inset-bottom));background:transparent}
 
     /* Empty state */
     .empty{padding:28px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.5));border:1px solid var(--border);text-align:center;color:var(--muted)}
+
+    /* Accessibility helper (screen-reader only) */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
     /* Responsive */
     @media (max-width:600px){
@@ -207,10 +212,10 @@
       <section id="study" class="screen">
         <div class="card-area">
           <div class="card-outer">
-            <div class="flashcard" id="flashcard" aria-live="polite">
+            <div class="flashcard" id="flashcard" aria-live="polite" tabindex="0" aria-describedby="cardHint">
+              <div id="cardHint" class="sr-only">按一下卡片或按空白鍵以顯示解答。左右鍵切換卡片。</div>
               <div class="card-inner" id="cardInner">
                 <div class="card-face face-front" id="faceFront">
-                  <div class="flip-hint-centered">點擊卡片顯示解答</div>
                   <div class="word-large" id="wordDisplay">Word</div>
                   <div class="pron-small" id="pronunciationSmall"></div>
                 </div>
@@ -331,38 +336,38 @@
       // IELTS & academic high-frequency words
       {word: "Analyze", chinese: "分析", definition: "Examine methodically and in detail.", pronunciation: "/ˈænəlaɪz/", example: "The study aims to analyze the data."},
       {word: "Assess", chinese: "評估", definition: "Evaluate or estimate the nature, ability, or quality of.", pronunciation: "/əˈsɛs/", example: "We need to assess the impact."},
-      {word: "Significant", chinese: "重要的；顯著的", definition: "Sufficiently great or important to be worthy of attention.", pronunciation: "/sɪɡˈnɪfɪkənt/", example: "There was a significant increase."},
+      {word: "Significant", chinese: "重要的；顯著的", definition: "Sufficiently great or important to be worthy of attention.", pronunciation: "/sɪɡˈnɪfɪkənt/", example: "There was [...]"},
       {word: "Coherent", chinese: "連貫的", definition: "Logical and consistent.", pronunciation: "/kəʊˈhɪərənt/", example: "The argument was coherent."},
       {word: "Sufficient", chinese: "足夠的", definition: "Enough; adequate.", pronunciation: "/səˈfɪʃənt/", example: "There is sufficient evidence."},
-      {word: "Illustrate", chinese: "說明；闡明", definition: "Explain or make (something) clear by using examples.", pronunciation: "/ˈɪləstreɪt/", example: "The diagram helps illustrate the process."},
-      {word: "Implication", chinese: "含意；可能的影響", definition: "A possible effect or result of an action or a decision.", pronunciation: "/ˌɪmplɪˈkeɪʃən/", example: "Consider the implications of the policy."},
-      {word: "Hypothesis", chinese: "假設", definition: "A proposed explanation made on the basis of limited evidence.", pronunciation: "/haɪˈpɒθəsɪs/", example: "The hypothesis was tested."},
-      {word: "Sustainable", chinese: "可持續的", definition: "Able to be maintained at a certain rate or level.", pronunciation: "/səˈsteɪnəbəl/", example: "We aim for sustainable growth."},
-      {word: "Aggregate", chinese: "總計；集成", definition: "Formed or calculated by the combination of several separate elements.", pronunciation: "/ˈæɡrɪɡət/", example: "Aggregate demand increased."},
-      {word: "Interpret", chinese: "解釋；闡釋", definition: "Explain the meaning of (information or actions).", pronunciation: "/ɪnˈtɜːprət/", example: "How do you interpret these results?"},
-      {word: "Evaluate", chinese: "評價；估價", definition: "Form an idea of the amount, number, or value of; assess.", pronunciation: "/ɪˈvæljueɪt/", example: "We need to evaluate the options."},
+      {word: "Illustrate", chinese: "說明；闡明", definition: "Explain or make (something) clear by using examples.", pronunciation: "/ˈɪləstreɪt/", example: "The diagram helps illustrat[...]"},
+      {word: "Implication", chinese: "含意；可能的影響", definition: "A possible effect or result of an action or a decision.", pronunciation: "/ˌɪmplɪˈkeɪʃən/", example: "Consider[...]"},
+      {word: "Hypothesis", chinese: "假設", definition: "A proposed explanation made on the basis of limited evidence.", pronunciation: "/haɪˈpɒθəsɪs/", example: "The hypothesis was teste[...]"},
+      {word: "Sustainable", chinese: "可持續的", definition: "Able to be maintained at a certain rate or level.", pronunciation: "/səˈsteɪnəbəl/", example: "We aim for sustainable growth[...]"},
+      {word: "Aggregate", chinese: "總計；集成", definition: "Formed or calculated by the combination of several separate elements.", pronunciation: "/ˈæɡrɪɡət/", example: "Aggregate d[...]"},
+      {word: "Interpret", chinese: "解釋；闡釋", definition: "Explain the meaning of (information or actions).", pronunciation: "/ɪnˈtɜːprət/", example: "How do you interpret these resu[...]"},
+      {word: "Evaluate", chinese: "評價；估價", definition: "Form an idea of the amount, number, or value of; assess.", pronunciation: "/ɪˈvæljueɪt/", example: "We need to evaluate the o[...]"},
       {word: "Concept", chinese: "概念", definition: "An abstract idea; a general notion.", pronunciation: "/ˈkɒnsɛpt/", example: "The concept was difficult to grasp."},
-      {word: "Evidence", chinese: "證據", definition: "The available body of facts indicating whether a belief is true.", pronunciation: "/ˈɛvɪdəns/", example: "There is little evidence to support the claim."},
+      {word: "Evidence", chinese: "證據", definition: "The available body of facts indicating whether a belief is true.", pronunciation: "/ˈɛvɪdəns/", example: "There is little evidence to [...]"},
       {word: "Context", chinese: "語境；背景", definition: "The circumstances that form the setting for an event.", pronunciation: "/ˈkɒntɛkst/", example: "Place the data in context."},
       {word: "Trend", chinese: "趨勢", definition: "A general direction in which something is developing.", pronunciation: "/trɛnd/", example: "The trend shows improvement."},
       {word: "Contrast", chinese: "對比；對照", definition: "Compare in such a way as to emphasize differences.", pronunciation: "/ˈkɒntrɑːst/", example: "Contrast the two approaches."},
       {word: "Factor", chinese: "因素", definition: "A circumstance, fact, or influence that contributes to a result.", pronunciation: "/ˈfæktə/", example: "Cost is a major factor."},
       {word: "Establish", chinese: "建立；確定", definition: "Set up on a firm or permanent basis.", pronunciation: "/ɪˈstæblɪʃ/", example: "They established a new procedure."},
-      {word: "Emphasize", chinese: "強調", definition: "Give special importance to something in speaking or writing.", pronunciation: "/ˈɛmfəsaɪz/", example: "The report emphasizes quality."},
+      {word: "Emphasize", chinese: "強調", definition: "Give special importance to something in speaking or writing.", pronunciation: "/ˈɛmfəsaɪz/", example: "The report emphasizes quality.[...]"},
       {word: "Method", chinese: "方法；方式", definition: "A particular procedure for accomplishing something.", pronunciation: "/ˈmɛθəd/", example: "Use a scientific method."},
-      {word: "Framework", chinese: "框架；構架", definition: "A basic structure underlying a system or concept.", pronunciation: "/ˈfreɪmwɜːk/", example: "The theoretical framework is robust."},
+      {word: "Framework", chinese: "框架；構架", definition: "A basic structure underlying a system or concept.", pronunciation: "/ˈfreɪmwɜːk/", example: "The theoretical framework is ro[...]"},
       // Accounting & finance terms
-      {word: "Asset", chinese: "資產", definition: "A resource with economic value owned by an individual or corporation.", pronunciation: "/ˈæsɛt/", example: "The company sold some assets."},
+      {word: "Asset", chinese: "資產", definition: "A resource with economic value owned by an individual or corporation.", pronunciation: "/ˈæsɛt/", example: "The company sold some assets[...]"},
       {word: "Liability", chinese: "負債", definition: "A company's legal debts or obligations.", pronunciation: "/ˌlaɪəˈbɪlɪti/", example: "Long-term liabilities rose."},
       {word: "Revenue", chinese: "營收；收入", definition: "Income generated from normal business operations.", pronunciation: "/ˈrɛvəˌnuː/", example: "Annual revenue increased."},
       {word: "Expense", chinese: "費用；支出", definition: "The economic costs a business incurs through operations.", pronunciation: "/ɪkˈspɛns/", example: "Reduce operating expenses."},
-      {word: "Depreciation", chinese: "折舊", definition: "A reduction in the value of an asset over time.", pronunciation: "/dɪˌpriːʃiˈeɪʃən/", example: "Depreciation affects net income."},
-      {word: "Accrual", chinese: "應計；應計項目", definition: "An accounting method that records revenues when earned and expenses when incurred.", pronunciation: "/əˈkruːəl/", example: "Use accrual accounting principles."},
+      {word: "Depreciation", chinese: "折舊", definition: "A reduction in the value of an asset over time.", pronunciation: "/dɪˌpriːʃiˈeɪʃən/", example: "Depreciation affects net incom[...]"},
+      {word: "Accrual", chinese: "應計；應計項目", definition: "An accounting method that records revenues when earned and expenses when incurred.", pronunciation: "/əˈkruːəl/", exampl[...]},
       {word: "Audit", chinese: "稽核；查帳", definition: "An official inspection of an organization's accounts.", pronunciation: "/ˈɔːdɪt/", example: "The audit was completed."},
       {word: "Equity", chinese: "權益；股東權益", definition: "The value of shares issued by a company.", pronunciation: "/ˈekwɪti/", example: "Shareholders' equity increased."},
-      {word: "Journal", chinese: "日誌；日記帳", definition: "A record of financial transactions in chronological order.", pronunciation: "/ˈdʒɜːrnəl/", example: "Post the entries to the journal."},
+      {word: "Journal", chinese: "日誌；日記帳", definition: "A record of financial transactions in chronological order.", pronunciation: "/ˈdʒɜːrnəl/", example: "Post the entries to t[...]"},
       {word: "Ledger", chinese: "總帳", definition: "A book or other collection of financial accounts.", pronunciation: "/ˈlɛdʒər/", example: "Update the general ledger."},
-      {word: "Cash flow", chinese: "現金流量", definition: "Total amount of money being transferred into and out of a business.", pronunciation: "/kæʃ floʊ/", example: "Positive cash flow is crucial."},
+      {word: "Cash flow", chinese: "現金流量", definition: "Total amount of money being transferred into and out of a business.", pronunciation: "/kæʃ floʊ/", example: "Positive cash flow [...]"},
       {word: "Inventory", chinese: "存貨", definition: "The raw materials, work-in-progress, and finished goods.", pronunciation: "/ˈɪnvəntəri/", example: "Inventory levels were reduced."},
       {word: "Capital", chinese: "資本；資金", definition: "Wealth in the form of money or assets.", pronunciation: "/ˈkæpɪtl/", example: "They raised capital for expansion."}
     ];
@@ -482,6 +487,11 @@
       flashcard.classList.toggle('flipped');
     });
 
+    /* Accessibility: support Enter/Space on focused flashcard */
+    flashcard.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); flashcard.classList.toggle('flipped'); }
+    });
+
     /* Speech */
     function speak(text){
       if(!('speechSynthesis' in window)) return;
@@ -556,8 +566,8 @@
         const el = document.createElement('div'); el.className='list-item';
         el.innerHTML = `<div class="list-left"><div class="list-title">${w.word}</div><div class="list-sub">${w.chinese}</div></div>`;
         const actions = document.createElement('div'); actions.className='list-actions';
-        const mark = document.createElement('button'); mark.className='pill'; mark.textContent='已掌握'; mark.onclick=()=>{ knownWords.push(w); unknownWords.splice(i,1); saveData(); renderReview(); updateStats(); };
-        const del = document.createElement('button'); del.className='pill'; del.textContent='刪除'; del.onclick=()=>{ if(confirm('確定刪除？')){ unknownWords.splice(i,1); saveData(); renderReview(); updateStats(); }};
+        const mark = document.createElement('button'); mark.className='pill'; mark.textContent='已掌握'; mark.onclick=()=>{ knownWords.push(w); unknownWords.splice(i,1); saveData(); renderRevi[...] 
+        const del = document.createElement('button'); del.className='pill'; del.textContent='刪除'; del.onclick=()=>{ if(confirm('確定刪除？')){ unknownWords.splice(i,1); saveData(); rende[...] 
         actions.appendChild(mark); actions.appendChild(del);
         el.appendChild(actions); reviewList.appendChild(el);
       });
@@ -572,7 +582,7 @@
         el.innerHTML = `<div class="list-left"><div class="list-title">${w.word}</div><div class="list-sub">${w.chinese}</div></div>`;
         const actions = document.createElement('div'); actions.className='list-actions';
         const edit = document.createElement('button'); edit.className='pill'; edit.textContent='編輯'; edit.onclick=()=>{ openModalForEdit(i); };
-        const del = document.createElement('button'); del.className='pill'; del.textContent='刪除'; del.onclick=()=>{ if(confirm('確定刪除？')){ customWords.splice(i,1); allWords = allWords.filter(x=>x.word!==w.word); saveData(); renderCustom(); updateStats(); renderCard(); }};
+        const del = document.createElement('button'); del.className='pill'; del.textContent='刪除'; del.onclick=()=>{ if(confirm('確定刪除？')){ customWords.splice(i,1); allWords = allWord[...] 
         actions.appendChild(edit); actions.appendChild(del);
         el.appendChild(actions); customList.appendChild(el);
       });
@@ -581,7 +591,7 @@
     /* Modal actions */
     function openModal(){ modal.classList.add('active'); }
     function closeModal(){ modal.classList.remove('active'); editIndex=null; wordForm.reset(); }
-    function openModalForEdit(i){ editIndex=i; const w = customWords[i]; fWord.value=w.word; fChinese.value=w.chinese; fDefinition.value=w.definition||''; fExample.value=w.example||''; openModal(); }
+    function openModalForEdit(i){ editIndex=i; const w = customWords[i]; fWord.value=w.word; fChinese.value=w.chinese; fDefinition.value=w.definition||''; fExample.value=w.example||''; openModal([...]
 
     wordForm.addEventListener('submit',(e)=>{
       e.preventDefault();
@@ -619,7 +629,7 @@
     });
     document.getElementById('btnClear').addEventListener('click',()=>{
       if(confirm('清除所有本地資料？此動作無法還原。')){
-        localStorage.removeItem(STORAGE_KEYS.all); localStorage.removeItem(STORAGE_KEYS.known); localStorage.removeItem(STORAGE_KEYS.unknown); localStorage.removeItem(STORAGE_KEYS.custom); localStorage.removeItem(STORAGE_KEYS.idx);
+        localStorage.removeItem(STORAGE_KEYS.all); localStorage.removeItem(STORAGE_KEYS.known); localStorage.removeItem(STORAGE_KEYS.unknown); localStorage.removeItem(STORAGE_KEYS.custom); localS[...] 
         loadData(); renderCustom(); renderReview(); renderCard(); updateStats();
       }
     });
